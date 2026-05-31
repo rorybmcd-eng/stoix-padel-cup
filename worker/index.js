@@ -42,6 +42,21 @@ export default {
       );
     }
 
+    // POST /reset?to=N — admin endpoint to manually set the counter
+    if (request.method === "POST" && url.pathname === "/reset") {
+      const to = parseInt(url.searchParams.get("to") ?? "8");
+      const secret = url.searchParams.get("secret");
+      // Basic secret check — prevents accidental resets
+      if (secret !== "stoix-padel-2026") {
+        return new Response("Unauthorised", { status: 401 });
+      }
+      await env.PADEL_COUNTER.put(COUNTER_KEY, to.toString());
+      return new Response(
+        JSON.stringify({ ok: true, registered: to, remaining: TOTAL_TEAMS - to }),
+        { headers: { "Content-Type": "application/json", ...CORS_HEADERS } }
+      );
+    }
+
     // POST /increment — called after successful form submission
     if (request.method === "POST" && url.pathname === "/increment") {
       const raw = await env.PADEL_COUNTER.get(COUNTER_KEY);

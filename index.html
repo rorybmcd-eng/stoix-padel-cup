@@ -857,7 +857,7 @@
 
         <div class="stat-row">
           <div class="stat">
-            <div class="stat-number">8</div>
+            <div class="stat-number" id="stat-remaining">8</div>
             <div class="stat-label">Spots Left</div>
           </div>
           <div class="stat">
@@ -1095,6 +1095,10 @@ const COUNTER_URL = 'https://stoix-padel-counter.rorybmcd.workers.dev';
     // Fraction
     const frac = document.querySelector('.capacity-fraction');
     if (frac) frac.innerHTML = `${registered} <span style="color:var(--grey-mid)">/ ${total} teams</span>`;
+
+    // Stat card
+    const statRemaining = document.getElementById('stat-remaining');
+    if (statRemaining) statRemaining.textContent = remaining;
 
     // Sub text
     const sub = document.querySelector('.capacity-sub');
