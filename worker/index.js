@@ -42,6 +42,56 @@ export default {
       );
     }
 
+    // POST /generate-name — calls Workers AI to generate team names
+    if (request.method === "POST" && url.pathname === "/generate-name") {
+      let body = {};
+      try { body = await request.json(); } catch {}
+
+      const firstName = (body.firstName || '').trim();
+      const firm = (body.firm || '').trim();
+
+      const prompt = `You are a witty sports event copywriter. Generate exactly 3 creative padel tennis team names for a private equity professional.
+Their first name is: ${firstName || 'unknown'}
+Their firm is: ${firm || 'unknown'}
+
+Rules:
+- Each name should be 2-4 words
+- Blend padel/tennis terminology with private equity/finance culture
+- Make them clever, punchy and fun — not generic
+- Use the person's name or firm name creatively in at least one suggestion
+- Return ONLY a JSON array of 3 strings, nothing else. Example: ["Name One", "Name Two", "Name Three"]`;
+
+      const ai = env.AI;
+      const response = await ai.run("@cf/meta/llama-3.1-8b-instruct", {
+        messages: [{ role: "user", content: prompt }],
+        max_tokens: 100,
+      });
+
+      // Parse the AI response — extract JSON array
+      let names = [];
+      try {
+        const text = response.response || '';
+        const match = text.match(/\[.*?\]/s);
+        if (match) {
+          names = JSON.parse(match[0]);
+        }
+      } catch {}
+
+      // Fallback if parsing fails
+      if (!names.length) {
+        names = [
+          `${firstName || firm} Smash Capital`,
+          `${firm || firstName} Court Partners`,
+          "The Net Returners"
+        ];
+      }
+
+      return new Response(
+        JSON.stringify({ names }),
+        { headers: { "Content-Type": "application/json", ...CORS_HEADERS } }
+      );
+    }
+
     // POST /reset?to=N — admin endpoint to manually set the counter
     if (request.method === "POST" && url.pathname === "/reset") {
       const to = parseInt(url.searchParams.get("to") ?? "8");
