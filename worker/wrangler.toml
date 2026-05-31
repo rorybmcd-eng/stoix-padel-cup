@@ -1,0 +1,8 @@
+name = "stoix-padel-counter"
+main = "index.js"
+compatibility_date = "2024-01-01"
+account_id = "3fa30f93e441194361c904f6cf13befe"
+
+kv_namespaces = [
+  { binding = "PADEL_COUNTER", id = "1be4f7657d8748e0bb52e7e9db6afb71" }
+]

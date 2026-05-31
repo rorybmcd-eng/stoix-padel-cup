@@ -1051,6 +1051,54 @@
 </div><!-- end page-wrap -->
 
 <script>
+const COUNTER_URL = 'https://stoix-padel-counter.rorybmcd.workers.dev';
+
+  // ── Live capacity counter ──────────────────────────────────
+  async function fetchCount() {
+    try {
+      const res = await fetch(`${COUNTER_URL}/count`);
+      const data = await res.json();
+      updateCapacityUI(data);
+    } catch (e) {
+      // Fail silently — static fallback values already in HTML
+    }
+  }
+
+  function updateCapacityUI({ registered, remaining, percent, total, full }) {
+    // Badge
+    const badge = document.querySelector('.urgency-badge');
+    if (badge) {
+      badge.querySelector('span:last-child') || badge.appendChild(document.createTextNode(''));
+      const text = badge.childNodes[badge.childNodes.length - 1];
+      text.textContent = full
+        ? ' Fully booked — join the waitlist'
+        : ` ${remaining} of ${total} spots remaining — ${percent}% full`;
+    }
+
+    // Progress bar
+    const fill = document.querySelector('.capacity-fill');
+    if (fill) fill.style.width = `${percent}%`;
+
+    // Fraction
+    const frac = document.querySelector('.capacity-fraction');
+    if (frac) frac.innerHTML = `${registered} <span style="color:var(--grey-mid)">/ ${total} teams</span>`;
+
+    // Sub text
+    const sub = document.querySelector('.capacity-sub');
+    if (sub) sub.textContent = full
+      ? 'All places filled — register below to join the waitlist'
+      : `${remaining} ${remaining === 1 ? 'place' : 'places'} remaining — register now to secure yours`;
+
+    // If full, update submit button
+    if (full) {
+      const btn = document.querySelector('.btn-submit');
+      if (btn) btn.textContent = 'Join Waitlist';
+    }
+  }
+
+  // Fetch on load
+  fetchCount();
+
   // ── Capacity bar animate on scroll ────────────────────────
   const fill = document.querySelector('.capacity-fill');
   if (fill) {
@@ -1098,6 +1146,10 @@
       });
 
       if (res.ok) {
+        // Increment the live counter
+        try { await fetch(`${COUNTER_URL}/increment`, { method: 'POST' }); } catch {}
+        // Refresh UI with new count
+        fetchCount();
         form.style.display = 'none';
         successBox.classList.add('visible');
       } else {
