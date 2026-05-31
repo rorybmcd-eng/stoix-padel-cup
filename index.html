@@ -660,6 +660,27 @@
       color: rgba(245, 244, 240, 0.25);
     }
 
+    .partner-fields {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .partner-fields input {
+      border-color: transparent;
+      background: rgba(255,255,255,0.04);
+    }
+    .partner-fields input:focus {
+      border-color: var(--coral);
+      background: rgba(241, 89, 76, 0.06);
+    }
+    .partner-fields .form-row {
+      gap: 10px;
+    }
+
     /* ─── Capacity bar ───────────────────────────────────────── */
     .capacity-bar-wrap {
       margin-top: 18px;
@@ -941,7 +962,7 @@
         <li>Complete confirmation within 48 hours of registering</li>
         <li>Full event briefing, venue details and timings sent one week before</li>
         <li>No experience necessary — all padel abilities welcome</li>
-        <li>Teams can register together or we can help pair individuals</li>
+        <li>Register solo and we'll pair you with another attendee</li>
         <li>Questions? Email <a href="mailto:contact@stoix.co.uk" style="color: var(--coral); text-decoration: none;">contact@stoix.co.uk</a></li>
       </ul>
     </div>
@@ -989,19 +1010,25 @@
         </div>
 
         <div class="form-group">
-          <label for="team_size">Registering as *</label>
-          <select id="team_size" name="team_size" required>
-            <option value="" disabled selected>Individual or team?</option>
-            <option value="Individual (happy to be paired)">Individual — happy to be paired</option>
-            <option value="Pair (2 players)">Pair (2 players)</option>
-            <option value="Full team (4 players)">Full team (4 players)</option>
-          </select>
-        </div>
-
-        <div class="form-group">
           <label for="team_name">Team Name <span style="color:var(--grey-mid);font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
           <input type="text" id="team_name" name="team_name" placeholder="e.g. Apex Smashers">
           <div class="form-note">Leave blank if you'd like us to help name your team</div>
+        </div>
+
+        <div class="form-group">
+          <label>Playing Partner <span style="color:var(--grey-mid);font-weight:400;text-transform:none;letter-spacing:0">(optional — leave blank if you'd like us to pair you)</span></label>
+          <div class="partner-fields">
+            <div class="form-row">
+              <div class="form-group" style="margin-bottom:0">
+                <input type="text" id="partner_first_name" name="partner_first_name" placeholder="First name">
+              </div>
+              <div class="form-group" style="margin-bottom:0">
+                <input type="text" id="partner_last_name" name="partner_last_name" placeholder="Last name">
+              </div>
+            </div>
+            <input type="email" id="partner_email" name="partner_email" placeholder="Work email" style="margin-top:10px">
+            <input type="text" id="partner_title" name="partner_title" placeholder="Title / Role  (e.g. Portfolio Director, CFO)" style="margin-top:10px">
+          </div>
         </div>
 
         <div class="form-group">
