@@ -660,6 +660,54 @@
       color: rgba(245, 244, 240, 0.25);
     }
 
+    .btn-generate {
+      background: rgba(241, 89, 76, 0.12);
+      border: 1px solid rgba(241, 89, 76, 0.4);
+      border-radius: var(--radius-sm);
+      color: var(--coral);
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 12px 14px;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .btn-generate:hover {
+      background: rgba(241, 89, 76, 0.22);
+      border-color: rgba(241, 89, 76, 0.7);
+    }
+    .btn-generate:active { transform: scale(0.97); }
+
+    .name-suggestions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .name-chip {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 6px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--offwhite);
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+    }
+    .name-chip:hover {
+      background: rgba(241, 89, 76, 0.15);
+      border-color: rgba(241, 89, 76, 0.5);
+      color: var(--coral);
+    }
+    .name-chip.selected {
+      background: rgba(241, 89, 76, 0.2);
+      border-color: var(--coral);
+      color: var(--coral);
+    }
+
     .partner-fields {
       background: rgba(255,255,255,0.03);
       border: 1px solid var(--border);
@@ -1011,8 +1059,14 @@
 
         <div class="form-group">
           <label for="team_name">Team Name <span style="color:var(--grey-mid);font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
-          <input type="text" id="team_name" name="team_name" placeholder="e.g. Apex Smashers">
-          <div class="form-note">Leave blank if you'd like us to help name your team</div>
+          <div style="display:flex;gap:8px;align-items:flex-start">
+            <input type="text" id="team_name" name="team_name" placeholder="e.g. Apex Smashers" style="flex:1">
+            <button type="button" id="generate-name-btn" class="btn-generate" onclick="generateTeamName()" title="Generate a team name">
+              ✨ Generate
+            </button>
+          </div>
+          <div id="name-suggestions" class="name-suggestions" style="display:none"></div>
+          <div class="form-note">Leave blank if you'd like us to suggest one, or generate one now</div>
         </div>
 
         <div class="form-group">
@@ -1159,6 +1213,69 @@ const COUNTER_URL = 'https://stoix-padel-counter.rorybmcd.workers.dev';
 
   // Fetch on load
   fetchCount();
+
+  // ── Team name generator ────────────────────────────────────
+  function generateTeamName() {
+    const firstName = (document.getElementById('first_name').value || '').trim();
+    const firm = (document.getElementById('company').value || '').trim();
+
+    // Padel / PE flavoured word banks
+    const power   = ['Smash','Drop','Drive','Volley','Lob','Spin','Ace','Rally','Slice','Serve'];
+    const animals  = ['Eagles','Sharks','Foxes','Bulls','Wolves','Hawks','Lions','Bears','Vipers','Falcons'];
+    const pe       = ['Capital','Partners','Ventures','Equity','Alpha','Delta','Apex','Summit','Pinnacle','Vantage'];
+    const adjective= ['Iron','Golden','Silver','Blazing','Swift','Bold','Sharp','Elite','Prime','Stellar'];
+    const court    = ['Court','Net','Baseline','Sideline','Deuce','Match'];
+
+    // Extract a usable word from the firm name
+    const firmWord = firm
+      ? firm.replace(/\b(ltd|llp|plc|inc|group|capital|partners|advisory|investments?|management|asset|fund)\b/gi, '')
+             .trim()
+             .split(/\s+/)
+             .find(w => w.length > 2) || ''
+      : '';
+
+    const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+
+    // Generate 3 name suggestions with different styles
+    const suggestions = [];
+
+    // Style 1: [FirstName] + Power word + Animals (e.g. "James Smashers")
+    if (firstName) {
+      suggestions.push(`${firstName}'s ${pick(power)}ers`);
+    }
+
+    // Style 2: Firm-derived + Court word + Power (e.g. "Apex Net Foxes")
+    if (firmWord) {
+      suggestions.push(`${firmWord} ${pick(court)} ${pick(animals)}`);
+      suggestions.push(`${pick(adjective)} ${firmWord} ${pick(animals)}`);
+    } else {
+      suggestions.push(`${pick(adjective)} ${pick(animals)}`);
+      suggestions.push(`${pick(pe)} ${pick(power)}ers`);
+    }
+
+    // Style 4: Always generate a pure padel/PE combo as a fallback
+    suggestions.push(`${pick(adjective)} ${pick(power)} ${pick(animals)}`);
+
+    // Dedupe and take 3
+    const unique = [...new Set(suggestions)].slice(0, 3);
+
+    // Render chips
+    const container = document.getElementById('name-suggestions');
+    container.innerHTML = unique.map(name =>
+      `<span class="name-chip" onclick="selectTeamName(this, '${name.replace(/'/g, "\\'")}')">${name}</span>`
+    ).join('');
+    container.style.display = 'flex';
+
+    // Pulse the button
+    const btn = document.getElementById('generate-name-btn');
+    btn.textContent = '✨ Regenerate';
+  }
+
+  function selectTeamName(chip, name) {
+    document.getElementById('team_name').value = name;
+    document.querySelectorAll('.name-chip').forEach(c => c.classList.remove('selected'));
+    chip.classList.add('selected');
+  }
 
   // ── Charity donation reveal ────────────────────────────────
   function toggleDonationAmount(value) {
