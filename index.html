@@ -999,6 +999,12 @@
         </div>
 
         <div class="form-group">
+          <label for="team_name">Team Name <span style="color:var(--grey-mid);font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
+          <input type="text" id="team_name" name="team_name" placeholder="e.g. Apex Smashers">
+          <div class="form-note">Leave blank if you'd like us to help name your team</div>
+        </div>
+
+        <div class="form-group">
           <label for="padel_level">Padel Experience</label>
           <select id="padel_level" name="padel_level">
             <option value="" disabled selected>Select level</option>
@@ -1011,13 +1017,24 @@
         </div>
 
         <div class="form-group">
-          <label for="charity_interest">Charity Involvement</label>
-          <select id="charity_interest" name="charity_interest">
-            <option value="" disabled selected>Would you like to get involved?</option>
-            <option value="Happy to contribute on the day">Happy to contribute on the day</option>
-            <option value="Interested in supporting further">Interested in supporting the charity further</option>
-            <option value="Happy to donate as part of registration">Happy to donate as part of registration</option>
-            <option value="No preference">No specific preference</option>
+          <label for="charity_donation">Open to making a charitable donation? <span style="color:var(--grey-mid);font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
+          <select id="charity_donation" name="charity_donation" onchange="toggleDonationAmount(this.value)">
+            <option value="" disabled selected>Select an option</option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+          </select>
+        </div>
+
+        <div class="form-group" id="donation-amount-group" style="display:none">
+          <label for="donation_amount">How much would you like to donate? <span style="color:var(--grey-mid);font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
+          <select id="donation_amount" name="donation_amount">
+            <option value="" disabled selected>Select an amount</option>
+            <option value="£25">£25</option>
+            <option value="£50">£50</option>
+            <option value="£100">£100</option>
+            <option value="£250">£250</option>
+            <option value="£500">£500</option>
+            <option value="Other (we'll be in touch)">Other — we'll be in touch</option>
           </select>
         </div>
 
@@ -1115,6 +1132,26 @@ const COUNTER_URL = 'https://stoix-padel-counter.rorybmcd.workers.dev';
 
   // Fetch on load
   fetchCount();
+
+  // ── Charity donation reveal ────────────────────────────────
+  function toggleDonationAmount(value) {
+    const group = document.getElementById('donation-amount-group');
+    if (value === 'Yes') {
+      group.style.display = 'block';
+      group.style.opacity = '0';
+      group.style.transform = 'translateY(-6px)';
+      requestAnimationFrame(() => {
+        group.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+        group.style.opacity = '1';
+        group.style.transform = 'translateY(0)';
+      });
+    } else {
+      group.style.transition = 'opacity 0.2s ease';
+      group.style.opacity = '0';
+      setTimeout(() => { group.style.display = 'none'; }, 200);
+      document.getElementById('donation_amount').value = '';
+    }
+  }
 
   // ── Capacity bar animate on scroll ────────────────────────
   const fill = document.querySelector('.capacity-fill');
