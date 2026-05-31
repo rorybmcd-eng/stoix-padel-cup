@@ -645,6 +645,60 @@
       color: rgba(245, 244, 240, 0.25);
     }
 
+    /* ─── Capacity bar ───────────────────────────────────────── */
+    .capacity-bar-wrap {
+      margin-top: 18px;
+      max-width: 440px;
+    }
+    .capacity-bar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 8px;
+    }
+    .capacity-label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--grey-mid);
+    }
+    .capacity-fraction {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 800;
+      font-size: 15px;
+      color: var(--offwhite);
+    }
+    .capacity-track {
+      width: 100%;
+      height: 8px;
+      background: var(--grey-faint);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      overflow: hidden;
+    }
+    .capacity-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--coral) 0%, #f7836f 100%);
+      border-radius: 100px;
+      transition: width 1.2s var(--ease-out);
+      position: relative;
+    }
+    .capacity-fill::after {
+      content: '';
+      position: absolute;
+      right: 0; top: 0; bottom: 0;
+      width: 4px;
+      background: rgba(255,255,255,0.4);
+      border-radius: 100px;
+    }
+    .capacity-sub {
+      font-size: 13px;
+      color: var(--coral);
+      font-weight: 500;
+      margin-top: 7px;
+    }
+
     /* ─── Animations ──────────────────────────────────────────── */
     @media (prefers-reduced-motion: no-preference) {
       .fade-up {
@@ -723,7 +777,19 @@
 
       <div class="urgency-badge">
         <span class="urgency-dot"></span>
-        Limited places remaining — 8 teams only
+        8 of 16 spots remaining — 50% full
+      </div>
+
+      <!-- Capacity bar -->
+      <div class="capacity-bar-wrap">
+        <div class="capacity-bar-header">
+          <span class="capacity-label">Team places filled</span>
+          <span class="capacity-fraction">8 <span style="color:var(--grey-mid)">/ 16 teams</span></span>
+        </div>
+        <div class="capacity-track">
+          <div class="capacity-fill" style="width: 50%"></div>
+        </div>
+        <div class="capacity-sub">8 places remaining — register now to secure yours</div>
       </div>
     </div>
 
@@ -779,7 +845,7 @@
         <div class="stat-row">
           <div class="stat">
             <div class="stat-number">8</div>
-            <div class="stat-label">Teams Only</div>
+            <div class="stat-label">Spots Left</div>
           </div>
           <div class="stat">
             <div class="stat-number">4h</div>
@@ -817,7 +883,7 @@
         <div class="about-icon">🤝</div>
         <div class="about-card-title">Curated Company</div>
         <div class="about-card-text">
-          Limited to 8 teams. Partners, Portfolio Directors, Operating Partners and CFOs from PE firms and their portfolio companies. Quality over quantity, always.
+          Limited to 16 teams — 8 spots remaining. Partners, Portfolio Directors, Operating Partners and CFOs from PE firms and their portfolio companies. Quality over quantity, always.
         </div>
       </div>
       <div class="about-card fade-up">
@@ -855,7 +921,7 @@
       <div class="section-eyebrow">Register</div>
       <h2 class="section-title">Secure Your<br>Place</h2>
       <p class="section-lead" style="margin-bottom: 32px;">
-        Places are limited to 8 teams. Fill in your details and we'll be in touch to confirm your spot and share everything you need for the day.
+        16 teams total — 8 spots already filled. Fill in your details and we'll be in touch to confirm your spot and share everything you need for the day.
       </p>
 
       <ul class="expect-list">
@@ -985,6 +1051,22 @@
 </div><!-- end page-wrap -->
 
 <script>
+  // ── Capacity bar animate on scroll ────────────────────────
+  const fill = document.querySelector('.capacity-fill');
+  if (fill) {
+    const targetWidth = fill.style.width;
+    fill.style.width = '0%';
+    const barObserver = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          setTimeout(() => { fill.style.width = targetWidth; }, 200);
+          barObserver.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.5 });
+    barObserver.observe(fill.closest('.capacity-bar-wrap'));
+  }
+
   // ── Scroll fade-up animations ──────────────────────────────
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(e => {
